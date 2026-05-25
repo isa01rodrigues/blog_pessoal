@@ -4,10 +4,13 @@ import java.time.LocalDateTime;
 
 import org.hibernate.annotations.UpdateTimestamp;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -30,9 +33,23 @@ public class Postagem {
 	private String texto;
 	
 	@UpdateTimestamp // Atualiza automaticamente a data/hora sempre que houver alteração no registro
-	private LocalDateTime data; //
+	private LocalDateTime data; 
 	
+	// Criação do relacionamento entre as tabelas
+	// N:1 (Muitos para Um)
+	// Muitas postagens podem estar relacionadas a apenas um tema
 	
+	@ManyToOne //define/mapeia o relacionamento entre entidades.
+	
+	// Responsável por evitar um loop infinito durante a conversão dos objetos para JSON,impedindo que Postagem chame Tema e Tema chame Postagem repetidamente
+	@JsonIgnoreProperties("postagem")
+	
+	// Cria um atributo chamado tema do tipo Tema,
+	// representando o relacionamento com a entidade Tema
+	private Tema tema;
+	
+	//Tema → classe
+	//tema → objeto/atributo/referência da classe Tema
 
 	public Long getId() {
 		return id;
@@ -64,6 +81,14 @@ public class Postagem {
 
 	public void setData(LocalDateTime data) {
 		this.data = data;
+	}
+
+	public Tema getTema() {
+		return tema;
+	}
+
+	public void setTema(Tema tema) {
+		this.tema = tema;
 	}
 	
 	

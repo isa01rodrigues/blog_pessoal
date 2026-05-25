@@ -21,6 +21,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.generation.blogpessoal.model.Postagem;
 import com.generation.blogpessoal.repository.PostagemRespository;
+import com.generation.blogpessoal.repository.TemaRepository;
 
 import jakarta.validation.Valid;
 
@@ -39,52 +40,86 @@ public class PostagemController {
 	@Autowired // O Spring cria automaticamente um objeto do repositório // e injeta dentro desta variável.
 	private PostagemRespository postagemRespository;
 	
-	 // Define que este método responderá a requisições GET.
-    // Exemplo:
-    // GET -> localhost:8080/postagem
-	@GetMapping
+	@Autowired
+	private TemaRepository temaRepository;
+	
+	// Define que este método responderá a requisições HTTP GET.
+	// Exemplo:
+	// GET -> localhost:8080/postagem
+	@GetMapping 
+	// caminho da url //postagens
 	public ResponseEntity<List<Postagem>> getAll(){
 		 // Busca todas as postagens do banco usando findAll()
-        // e retorna resposta HTTP 200 (OK).
+	    // e retorna uma resposta HTTP 200 (OK).
 		return ResponseEntity.ok(postagemRespository.findAll());
 	}
 	
-	@GetMapping("/{id}")
+	// Define a URL para buscar uma postagem específica pelo id.
+	// Exemplo:
+	// GET -> localhost:8080/postagem/123
+	@GetMapping("/{id}") //
 	public ResponseEntity<Postagem> getById(@PathVariable Long id){
-		return postagemRespository.findById(id)
-				.map(resposta -> ResponseEntity.ok(resposta))
-				.orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+		return postagemRespository.findById(id) //métodos de manipulação de dados no sql
+				
+				//.map metodo lambda
+				.map(resposta -> ResponseEntity.ok(resposta)) // resposta -> representa o objeto recuperado dentro do Optional,ResponseEntity.ok() cria uma resposta HTTP 200 (OK) e envia o objeto encontrado para o usuário
+				.orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());  //Se o Optional estiver vazio (nenhum objeto encontrado),retorna uma resposta HTTP 404 (NOT_FOUND) sem corpo na resposta.
 	}
 
+	// Define a URL para buscar postagens pelo título.
+	// Exemplo:
+	// GET -> localhost:8080/postagem/titulo/java
 	@GetMapping("/titulo/{titulo}")
 	public ResponseEntity<List<Postagem>> getByTitulo(@PathVariable String titulo){
 		return ResponseEntity.ok(postagemRespository.findAllByTituloContainingIgnoreCase(titulo));
 	}
 	
-	//Representa o Insert no SQL -Inserir
+	// Operações do CRUD
+	//
+	// Representa o INSERT do SQL (criar/inserir dados)
 	@PostMapping
 	public ResponseEntity<Postagem> post(@Valid @RequestBody Postagem postagem){
 		
-		postagem.setId(null);
+		if (temaRepository.existsById(postagem.getTema().getId())) {
+			  // Garante que o id será gerado automaticamente
+			postagem.setId(null);
+			
+			return ResponseEntity.status(HttpStatus.CREATED)
+					.body(postagemRespository.save(postagem));
+		}
 		
-		return ResponseEntity.status(HttpStatus.CREATED)
-				.body(postagemRespository.save(postagem));
+		throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "tema não existe!", null);
+		
 	}
 	
-	//Equivalente UPDATE no Sql - Atualizar
+	
+	// Representa o UPDATE do SQL (atualizar dados)
 	@PutMapping
 	public ResponseEntity<Postagem> put(@Valid @RequestBody Postagem postagem){
-		return postagemRespository.findById(postagem.getId())
-				.map(resposta -> ResponseEntity.status(HttpStatus.OK)
-					.body(postagemRespository.save(postagem)))
-				.orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+	
+		
+		if (postagemRespository.existsById(postagem.getId())) {
+			
+			if (temaRepository.existsById(postagem.getTema().getId()))
+				return  ResponseEntity.status(HttpStatus.OK)
+						.body(postagemRespository.save(postagem));
+			
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "tema não existe!", null);		
+			
+		}
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 	}
 	
+	
+	
+	
+	
+	// Representa o DELETE do SQL (remover dados)
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	@DeleteMapping("/{id}")
 	public void delete(@PathVariable Long id) {
 		Optional<Postagem> postagem = postagemRespository.findById(id);
-		
+		// Se o id não existir, retorna erro 404
 		if(postagem.isEmpty())
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND);
 		
