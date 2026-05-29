@@ -15,9 +15,6 @@ import com.generation.blogpessoal.model.Postagem;
 //Importa a classe Postagem, que representa a entidade/tabela do banco.
 
 
-
-
-
 public interface PostagemRespository extends JpaRepository<Postagem, Long> {
 
 // Criação da interface do repositório da entidade Postagem.

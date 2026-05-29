@@ -37,9 +37,13 @@ public class Tema {
 			mappedBy ="tema", // Indica que o relacionamento é controlado pelo atributo "tema" da classe Postagem
 			cascade = CascadeType.REMOVE // Remove as postagens relacionadas quando um tema for removido
 			)  
+	
 	// Responsável por evitar um loop infinito durante a conversão dos objetos para JSON
 	@JsonIgnoreProperties(value = "tema", allowSetters = true)
 	private List<Postagem> postagem;
+	
+
+	
 	
 	// Método getter: retorna o valor do atributo id
 	public Long getId() {
