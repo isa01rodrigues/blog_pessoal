@@ -26,7 +26,7 @@ public class Usuario {
 
 	//NOME
 	@NotBlank(message = "O atributo Nome é obrigatório!") // Valida que o campo não pode ser nulo, vazio ou conter// apenas espaços
-	@Size(min = 5, max = 255, message = "Informe seu nome.") // Define o tamanho mínimo e máximo permitido
+	@Size( max = 255, message = "Informe seu nome.") // Define o tamanho mínimo e máximo permitido
 	private String nome;
 
 	//E-MAIL
