@@ -4,6 +4,8 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -19,36 +21,37 @@ import jakarta.validation.constraints.Size;
 @Entity
 @Table(name = "tb_usuarios")
 public class Usuario {
-	
+
 	@Id // Define o atributo como chave primária da tabela
-	@GeneratedValue(strategy = GenerationType.IDENTITY) // Define que a chave primária (id) será gerada// automaticamente// com incremento automático (auto increment).
+	@GeneratedValue(strategy = GenerationType.IDENTITY) // Define que a chave primária (id) será gerada//
+														// automaticamente// com incremento automático (auto increment).
 	private Long id;
 
-	//NOME
-	@NotBlank(message = "O atributo Nome é obrigatório!") // Valida que o campo não pode ser nulo, vazio ou conter// apenas espaços
-	@Size( max = 255, message = "Informe seu nome.") // Define o tamanho mínimo e máximo permitido
+	// NOME
+	@NotBlank(message = "O atributo Nome é obrigatório!") // Valida que o campo não pode ser nulo, vazio ou conter//
+															// apenas espaços
+	@Size(max = 255, message = "Informe seu nome.") // Define o tamanho mínimo e máximo permitido
 	private String nome;
 
-	//E-MAIL
-	@NotBlank(message = "O atributo E-mail é obrigatório!")
-	@Size(min = 10, max = 255)
-	@Email( message = "Informe seu E-mail.")
+	// E-MAIL
+	@Schema(example = "email@email.com.br")
+	@NotBlank(message = "O Atributo Usuário é Obrigatório!")
+	@Email(message = "O Atributo Usuário deve ser um email válido!")
 	private String usuario;
 
-	
 	// Validação de senha -> vereficar se pode adicionar futuramente
 	// @Pattern(
 	// regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&]).{8,}$",
 	// message = "A senha deve conter letra maiúscula, minúscula, número e caractere
 	// especial.")
 
-	//SENHA
+	// SENHA
 	@NotBlank(message = "O atributo Senha é obrigatório!")
 	@Size(min = 8, max = 255, message = "Crie uma senha forte!")
 	private String senha;
 
-	//FOTO
-	@Size( max = 5000, message = "O link da foto não pode ser maior 5000 caracteres.")
+	// FOTO
+	@Size(max = 5000, message = "O link da foto não pode ser maior 5000 caracteres.")
 	private String foto;
 
 	// Relacionemento
